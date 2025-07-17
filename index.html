@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KLS Logistics - AI Assistant Sia</title>
+    <meta name="description" content="KLS Logistics AI-powered chatbot with Sia assistant for AWB tracking and customer support. Get instant answers to your logistics questions.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            /* Changed background to a dark blue gradient */
+            background: linear-gradient(135deg, #0a1930 0%, #1a2a44 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Chat Container */
+        #chat-container {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Animated Sia */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .hannah-avatar { /* Renamed to sia-avatar for consistency, but keeping hannah-avatar for now to avoid breaking existing styles */
+            animation: float 3s ease-in-out infinite;
+            border: 3px solid #60a5fa;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
+        }
+
+        .hannah-avatar:hover { /* Renamed to sia-avatar for consistency */
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        /* Typing Animation */
+        @keyframes typing {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .typing-dot {
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Chat Bubbles */
+        .chat-bubble {
+            animation: slideInUp 0.3s ease-out;
+            transform-origin: bottom;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Truck Animation */
+        .truck-loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .truck {
+            position: relative;
+            width: 120px;
+            height: 60px;
+            animation: drive 2s infinite ease-in-out;
+        }
+
+        .truck-body {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 85px;
+            height: 45px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .truck-cab {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 35px;
+            height: 40px;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            border-radius: 6px 6px 0 0;
+        }
+
+        .truck-cab::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 27px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .wheel {
+            position: absolute;
+            bottom: -12px;
+            width: 24px;
+            height: 24px;
+            background: #1e293b;
+            border-radius: 50%;
+            animation: spin 0.6s infinite linear;
+        }
+
+        .wheel-front { right: 8px; }
+        .wheel-back { left: 8px; }
+
+        @keyframes drive {
+            0% { transform: translateX(-3px); }
+            50% { transform: translateX(3px); }
+            100% { transform: translateX(-3px); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Timeline */
+        .timeline-item {
+            position: relative;
+            padding-left: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-left: 3px solid #60a5fa;
+        }
+
+        .timeline-item:last-child {
+            border-left: 3px solid transparent;
+        }
+
+        .timeline-icon {
+            position: absolute;
+            left: -1.2rem; /* Adjusted for better alignment */
+            top: 0;
+            width: 2.4rem;
+            height: 2.4rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Glassmorphism effects */
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        /* Input styles */
+        .chat-input {
+            /* Changed background to a light blue and added shadow */
+            background: rgba(220, 230, 255, 0.9); /* Light blue background */
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(96, 165, 250, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+        }
+
+        .chat-input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        /* Button animations */
+        .btn-send, .btn-voice {
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            transition: all 0.3s ease;
+        }
+
+        .btn-send:hover, .btn-voice:hover {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Voice button specific styles */
+        .btn-voice.recording {
+            background: linear-gradient(135deg, #ef4444, #dc2626); /* Red gradient when recording */
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+
+        /* Scrollbar styling */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(96, 165, 250, 0.5);
+            border-radius: 3px;
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            body {
+                padding: 0;
+            }
+            
+            #chat-container {
+                height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
+            
+            .chat-messages {
+                height: calc(100vh - 160px); /* Adjust based on header/footer */
+            }
+        }
+
+        /* Custom animations for colorful elements */
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .rainbow-text {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: rainbow 3s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            /* Removed text-stroke for border */
+            -webkit-text-stroke: 0px transparent; /* Set stroke to 0px */
+            text-stroke: 0px transparent; /* Set stroke to 0px */
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div id="chat-container" class="w-full max-w-md bg-white/90 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <header class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white">
+                <div class="flex items-center gap-3">
+                    <img src="https://wallpapercave.com/uwp/uwp4825588.png" 
+                         alt="KLS Logistics Logo" 
+                         class="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+                         onerror="this.src='https://placehold.co/48x48/1d4ed8/ffffff?text=KLS'">
+                    <div>
+                        <h1 class="text-xl font-bold text-[#84cbfa]">KLS Logistics</h1>
+                        <p class="text-sm rainbow-text">AI Assistant</p>
+                    </div>
+                </div>
+            </header>
+
+            <main id="chat-messages" class="chat-messages flex-grow overflow-y-auto p-4 space-y-4 glass">
+                <!-- Initial Welcome Message -->
+                <div class="flex items-start gap-2 chat-bubble"> <!-- Changed gap-3 to gap-2 -->
+                    <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
+                         alt="Sia AI Assistant" 
+                         class="hannah-avatar w-16 h-16 rounded-full object-cover flex-shrink-0"
+                         onerror="this.src='https://placehold.co/64x64/60a5fa/ffffff?text=👩'">
+                    <div class="glass rounded-2xl rounded-bl-none p-4 max-w-sm"> <!-- Changed max-w-xs to max-w-sm -->
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="font-semibold text-blue-800 rainbow-text">Sia</span>
+                            <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
+                        </div>
+                        <p class="text-gray-700 leading-relaxed">
+                            Hello! I'm Sia, your KLS Logistics AI assistant! 🚚✨
+                        </p>
+                       	<p class="text-gray-700 text-sm mt-2">• Enter AWB number for tracking</p>
+				        <p class="text-gray-700 text-sm">• Ask me any logistics questions</p>
+				        <p class="text-gray-700 text-sm">• I'm here to help 24/7!</p>
+                    </div>
+                </div>
+                 <!-- Loading indicators will be injected here by JS -->
+            </main>
+
+            <footer class="p-4 bg-white/95 border-t border-gray-200/50">
+                <div class="flex items-center gap-3 w-full"> <!-- Added w-full here to ensure the flex container takes full width -->
+                    <input type="text" 
+                           id="user-input" 
+                           class="chat-input flex-grow p-3 rounded-xl focus:outline-none focus:ring-0 placeholder-gray-500 min-w-0">
+                    <button id="voice-input-btn"
+                            class="btn-voice p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
+                        <span class="material-icons">mic</span>
+                    </button>
+                    <button onclick="sendMessage()" 
+                            class="btn-send p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
+                        <span class="material-icons">send</span>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-900 mt-2 text-center">
+                    Powered by KLS Logistics AI • Available 24/7
+                </p>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const CONFIG = {
+            AWB_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw2P8s2pXbRgxtpbLAEFr3JwNBAqJvXvSZdXfDJQ_xC_ptaQx6OuVkQtI1_jsmEvT06Mg/exec",
+            FAQ_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby2sD6dNXBNHV-q8PyahjS7bMzVdDjskEpDWQr1ncG1cQlM5nUi9fIfxc7BIES0eag/exec",
+            TYPING_DELAY: 1000,
+        };
+
+        // --- DOM Elements ---
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const voiceInputBtn = document.getElementById('voice-input-btn');
+
+        // --- Icon mapping for tracking events ---
+        const TRACKING_ICONS = {
+            'BOOKING': 'receipt_long',
+            'CONSIGNOR': 'person',
+            'CONSIGNEE': 'person_pin_circle',
+            'LOADING': 'inventory',
+            'FORWARD': 'local_shipping',
+            'RECEIVED': 'where_to_vote',
+            'OUT FOR DELIVERY': 'delivery_dining',
+            'STATUS': 'task_alt',
+            'UPI': 'payments',
+            'CASH DEPOSIT': 'account_balance',
+            'DEFAULT': 'info'
+        };
+        
+        // --- NEW: Define the desired display order for tracking statuses ---
+        const DISPLAY_ORDER = [
+            'Booking', 
+            'Consignor', 
+            'Consignee', 
+            'Loading', 
+            'Forward', 
+            'Received', 
+            'Out For Delivery', 
+            'Status'
+        ];
+
+        // --- Chat Functions ---
+
+        function addUserMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex justify-end chat-bubble';
+            messageDiv.innerHTML = `<div class="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl rounded-br-none p-4 max-w-xs"><p class="leading-relaxed">${escapeHtml(message)}</p></div>`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function addHannahMessage(message, isHtml = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'flex items-start gap-2 chat-bubble'; /* Changed gap-3 to gap-2 */
+            messageDiv.innerHTML = `
+                <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
+                         alt="Sia" 
+                         class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
+                         onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
+                <div class="glass rounded-2xl rounded-bl-none p-4 w-full max-w-sm"> <!-- Changed max-w-xs to max-w-sm -->
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="font-semibold text-blue-800 rainbow-text">Sia</span>
+                        <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
+                    </div>
+                    <div class="text-gray-700 leading-relaxed">${isHtml ? message : escapeHtml(message)}</div>
+                </div>`;
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+        
+        function showLoading(type = 'normal') {
+            const loaderId = `${type}-loader`;
+            hideLoading(); 
+            const loaderDiv = document.createElement('div');
+            loaderDiv.id = loaderId;
+            loaderDiv.className = 'flex items-start gap-2 chat-bubble'; /* Changed gap-3 to gap-2 */
+            if (type === 'tracking') {
+                loaderDiv.innerHTML = `
+                    <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
+                         alt="Sia" 
+                         class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
+                         onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
+                    <div class="glass rounded-2xl rounded-bl-none p-4 w-full max-w-sm text-center"> <!-- Changed max-w-xs to max-w-sm -->
+                        <div class="truck-loader"><div class="truck"><div class="truck-body"></div><div class="truck-cab"></div><div class="wheel wheel-back"></div><div class="wheel wheel-front"></div></div></div>
+                        <p class="text-md font-semibold mt-4 text-blue-800">Tracking your shipment...</p>
+                    </div>`;
+            } else {
+                loaderDiv.innerHTML = `
+                    <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
+                         alt="Sia" 
+                         class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
+                         onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
+                    <div class="glass rounded-2xl rounded-bl-none p-4 flex items-center gap-2"> <!-- Changed max-w-xs to max-w-sm -->
+                        <span class="text-gray-700">Sia is thinking</span>
+                        <div class="flex gap-1"><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div></div>
+                    </div>`;
+            }
+            chatMessages.appendChild(loaderDiv);
+            scrollToBottom();
+        }
+
+        function hideLoading() {
+            const normalLoader = document.getElementById('normal-loader');
+            const trackingLoader = document.getElementById('tracking-loader');
+            if (normalLoader) normalLoader.remove();
+            if (trackingLoader) trackingLoader.remove();
+        }
+
+        // --- Logic Handlers ---
+
+        function isNumeric(str) {
+            if (typeof str != "string") return false;
+            return /^\d+$/.test(str.trim());
+        }
+
+        async function handleAWBTracking(awbNumber) {
+            showLoading('tracking');
+            try {
+                const response = await fetch(`${CONFIG.AWB_SCRIPT_URL}?awb=${awbNumber}`);
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                
+                let data = await response.json();
+                hideLoading();
+                
+                if (data.error) {
+                    addHannahMessage(`❌ ${data.error}`);
+                    return;
+                }
+                
+                if (!data || data.length === 0) {
+                    addHannahMessage(`🔍 No tracking information found for AWB: <strong>${escapeHtml(awbNumber)}</strong>. Please check the number and try again.`, true);
+                    return;
+                }
+                
+                // --- UPDATED: Sort the data based on the predefined DISPLAY_ORDER array ---
+                data.sort((a, b) => {
+                    // Find the index of each item's icon in the display order.
+                    // Use a high number for items not in the list to push them to the end.
+                    const indexA = DISPLAY_ORDER.indexOf(a.icon) !== -1 ? DISPLAY_ORDER.indexOf(a.icon) : Infinity;
+                    const indexB = DISPLAY_ORDER.indexOf(b.icon) !== -1 ? DISPLAY_ORDER.indexOf(b.icon) : Infinity;
+                    return indexA - indexB;
+                });
+                
+                displayTrackingResults(data, awbNumber);
+                
+            } catch (error) {
+                hideLoading();
+                console.error('AWB Tracking Error:', error);
+                addHannahMessage(`🚫 Sorry, I couldn't fetch the tracking information right now. Please check your connection or try again in a moment.`);
+            }
+        }
+
+        async function handleFAQQuery(query) {
+            showLoading('normal');
+            try {
+                const response = await fetch(`${CONFIG.FAQ_SCRIPT_URL}?action=faq&query=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
+                
+                const data = await response.json();
+                hideLoading();
+                
+                if (data.error) {
+                    addHannahMessage(`❌ ${data.error}`);
+                    return;
+                }
+                
+                if (data.answer) {
+                    addHannahMessage(`💡 ${data.answer}`);
+                } else {
+                    addHannahMessage(`🤔 I'm not sure how to answer that. I'm best at tracking shipments with an AWB number. Could you please try rephrasing or ask another logistics-related question?`);
+                }
+                
+            } catch (error) {
+                hideLoading();
+                console.error('FAQ Query Error:', error);
+                addHannahMessage(`🚫 I'm having a little trouble connecting to my knowledge base. Please try asking again in a moment.`);
+            }
+        }
+
+        function displayTrackingResults(trackingData, awbNumber) {
+            let trackingHtml = `
+                <div class="mb-4">
+                    <h3 class="font-bold text-lg text-blue-800 mb-2">📦 Tracking: ${escapeHtml(awbNumber)}</h3>
+                </div>
+                <div class="space-y-0">`;
+            
+            trackingData.forEach((item) => {
+                const iconName = TRACKING_ICONS[item.icon?.toUpperCase()] || TRACKING_ICONS.DEFAULT;
+                let detailsContent = item.details;
+
+                // Check if the current item's icon is 'LOADING' or 'OUT FOR DELIVERY'
+                if (item.icon?.toUpperCase() === 'LOADING' || item.icon?.toUpperCase() === 'OUT FOR DELIVERY') {
+                    // Regex to find phone numbers (e.g., 10 digits, with optional spaces/dashes)
+                    // This regex looks for "Ph No.:" or "DRIVER NO:" followed by a number.
+                    // It captures the number part.
+                    const phoneRegex = /(Ph No\.:\s*|DRIVER NO:\s*)(\+?\d[\d\s-]{7,}\d)/gi;
+                    detailsContent = detailsContent.replace(phoneRegex, (match, prefix, number) => {
+                        // Clean the number for the tel: link (remove spaces and dashes)
+                        const cleanNumber = number.replace(/[\s-]/g, '');
+                        return `${prefix}<a href="tel:${cleanNumber}" class="text-blue-500 hover:underline">${number}</a>`;
+                    });
+                }
+
+                trackingHtml += `
+                    <div class="timeline-item">
+                        <div class="timeline-icon"><span class="material-icons text-base">${iconName}</span></div>
+                        <div class="flex justify-between items-start">
+                            <p class="font-semibold text-blue-700">${escapeHtml(item.icon)}</p>
+                            <div class="text-xs text-gray-500 text-right">
+                                <div>${escapeHtml(item.date)}</div>
+                                <div>${escapeHtml(item.time)}</div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">${detailsContent}</p>
+                    </div>`;
+            });
+            
+            trackingHtml += `</div>`;
+            addHannahMessage(trackingHtml, true);
+        }
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+            addUserMessage(message);
+            userInput.value = '';
+            if (isNumeric(message)) {
+                await handleAWBTracking(message);
+            } else {
+                await handleFAQQuery(message);
+            }
+        }
+
+        // --- Voice Input Functionality ---
+        let recognition;
+        let isRecording = false;
+
+        function startVoiceInput() {
+            if (!('webkitSpeechRecognition' in window)) {
+                addHannahMessage("🚫 Your browser does not support Web Speech API. Please use Google Chrome for voice input.");
+                return;
+            }
+
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false; // Listen for a single utterance
+            recognition.interimResults = true; // Get interim results
+            recognition.lang = 'en-US'; // Set language
+
+            recognition.onstart = () => {
+                isRecording = true;
+                voiceInputBtn.classList.add('recording');
+                voiceInputBtn.querySelector('.material-icons').textContent = 'mic_off';
+                userInput.placeholder = "Listening...";
+                userInput.value = ''; // Clear input field when listening starts
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                userInput.value = finalTranscript || interimTranscript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                addHannahMessage(`🎙️ Voice input error: ${event.error}. Please try again.`);
+                stopVoiceInput(); // Ensure UI resets on error
+            };
+
+            recognition.onend = () => {
+                stopVoiceInput();
+                // If there's content in the input field after recognition ends, send it
+                if (userInput.value.trim() !== '') {
+                    sendMessage();
+                }
+            };
+
+            recognition.start();
+        }
+
+        function stopVoiceInput() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isRecording = false;
+            voiceInputBtn.classList.remove('recording');
+            voiceInputBtn.querySelector('.material-icons').textContent = 'mic';
+            userInput.placeholder = ""; // Reset placeholder
+        }
+
+        // --- Utility Functions ---
+        function escapeHtml(text) {
+            if (typeof text !== 'string') return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // --- Event Listeners ---
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        voiceInputBtn.addEventListener('click', () => {
+            if (isRecording) {
+                stopVoiceInput();
+            } else {
+                startVoiceInput();
+            }
+        });
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', () => {
+            userInput.focus();
+            
+            // Add some sample suggestions after initial load
+            setTimeout(() => {
+                addHannahMessage(`🌟 Thank you for reaching out to KLS Logistics. How can I assist you today?`);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
