@@ -270,52 +270,66 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            /* Removed text-stroke for border */
-            -webkit-text-stroke: 0px transparent; /* Set stroke to 0px */
-            text-stroke: 0px transparent; /* Set stroke to 0px */
+            /* Added text-stroke for white border */
+            -webkit-text-stroke: 1px white; /* White stroke for Webkit browsers */
+            text-stroke: 1px white; /* White stroke for other browsers */
+        }
+
+        /* Header/Footer animation */
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animated-gradient-bg {
+            background-size: 200% 200%;
+            animation: gradient-animation 5s ease infinite;
         }
     </style>
 </head>
 <body>
     <div class="min-h-screen flex items-center justify-center p-4">
         <div id="chat-container" class="w-full max-w-md bg-white/90 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-            <header class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white">
+            <header class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white animated-gradient-bg">
                 <div class="flex items-center gap-3">
                     <img src="https://wallpapercave.com/uwp/uwp4825588.png" 
                          alt="KLS Logistics Logo" 
-                         class="w-12 h-12 rounded-full object-cover border-2 border-white/30"
+                         class="w-14 h-14 rounded-full object-cover border-2 border-white/30"
                          onerror="this.src='https://placehold.co/48x48/1d4ed8/ffffff?text=KLS'">
                     <div>
-                        <h1 class="text-xl font-bold text-[#84cbfa]">KLS Logistics</h1>
-                        <p class="text-sm rainbow-text">AI Assistant</p>
+                        <h1 class="text-2xl font-bold text-[#74EAFF]">KLS Logistics</h1>
+                        <p class="text-base rainbow-text">AI Assistant</p>
                     </div>
                 </div>
             </header>
 
             <main id="chat-messages" class="chat-messages flex-grow overflow-y-auto p-4 space-y-4 glass">
                 <!-- Initial Welcome Message -->
-                <div class="flex items-start gap-2 chat-bubble"> <!-- Changed gap-3 to gap-2 -->
+                <div class="flex items-start gap-2 chat-bubble">
                     <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
                          alt="Sia AI Assistant" 
                          class="hannah-avatar w-16 h-16 rounded-full object-cover flex-shrink-0"
                          onerror="this.src='https://placehold.co/64x64/60a5fa/ffffff?text=👩'">
-                    <div class="glass rounded-2xl rounded-bl-none p-4 max-w-sm"> <!-- Changed max-w-xs to max-w-sm -->
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="font-semibold text-blue-800 rainbow-text">Sia</span>
+                    <div class="flex flex-col items-start">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-semibold text-blue-800 rainbow-text text-lg">Sia</span>
                             <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
                         </div>
-                        <p class="text-gray-700 leading-relaxed">
-                            Hello! I'm Sia, your KLS Logistics AI assistant! 🚚✨
-                        </p>
-                       	<p class="text-gray-700 text-sm mt-2">• Enter AWB number for tracking</p>
-				        <p class="text-gray-700 text-sm">• Ask me any logistics questions</p>
-				        <p class="text-gray-700 text-sm">• I'm here to help 24/7!</p>
+                        <div class="glass rounded-2xl rounded-tl-none p-4 max-w-sm">
+                            <p class="text-gray-700 leading-relaxed">
+                                Hello! I'm Sia, your KLS Logistics AI assistant! 🚚✨
+                            </p>
+                            <p class="text-gray-700 text-sm mt-2">• Enter AWB number for tracking</p>
+                            <p class="text-gray-700 text-sm">• Ask me any logistics questions</p>
+                            <p class="text-gray-700 text-sm">• I'm here to help 24/7!</p>
+                        </div>
                     </div>
                 </div>
                  <!-- Loading indicators will be injected here by JS -->
             </main>
 
-            <footer class="p-4 bg-white/95 border-t border-gray-200/50">
+            <footer class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 border-t border-gray-200/50 animated-gradient-bg">
                 <div class="flex items-center gap-3 w-full"> <!-- Added w-full here to ensure the flex container takes full width -->
                     <input type="text" 
                            id="user-input" 
@@ -329,7 +343,7 @@
                         <span class="material-icons">send</span>
                     </button>
                 </div>
-                <p class="text-xs text-gray-900 mt-2 text-center">
+                <p class="text-xs text-gray-900 mt-2 text-center rainbow-text">
                     Powered by KLS Logistics AI • Available 24/7
                 </p>
             </footer>
@@ -342,6 +356,7 @@
             AWB_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw2P8s2pXbRgxtpbLAEFr3JwNBAqJvXvSZdXfDJQ_xC_ptaQx6OuVkQtI1_jsmEvT06Mg/exec",
             FAQ_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby2sD6dNXBNHV-q8PyahjS7bMzVdDjskEpDWQr1ncG1cQlM5nUi9fIfxc7BIES0eag/exec",
             TYPING_DELAY: 1000,
+            // INACTIVITY_TIMEOUT: 30000 // 30 seconds - Removed as per user request
         };
 
         // --- DOM Elements ---
@@ -376,6 +391,20 @@
             'Status'
         ];
 
+        // --- Inactivity Timer - Removed as per user request ---
+        // let inactivityTimer;
+
+        // function startInactivityTimer() {
+        //     inactivityTimer = setTimeout(() => {
+        //         addHannahMessage("Do you want any further Assistance?");
+        //     }, CONFIG.INACTIVITY_TIMEOUT);
+        // }
+
+        // function resetInactivityTimer() {
+        //     clearTimeout(inactivityTimer);
+        //     startInactivityTimer();
+        // }
+
         // --- Chat Functions ---
 
         function addUserMessage(message) {
@@ -384,25 +413,29 @@
             messageDiv.innerHTML = `<div class="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl rounded-br-none p-4 max-w-xs"><p class="leading-relaxed">${escapeHtml(message)}</p></div>`;
             chatMessages.appendChild(messageDiv);
             scrollToBottom();
+            // resetInactivityTimer(); // Removed as per user request
         }
 
         function addHannahMessage(message, isHtml = false) {
             const messageDiv = document.createElement('div');
-            messageDiv.className = 'flex items-start gap-2 chat-bubble'; /* Changed gap-3 to gap-2 */
+            messageDiv.className = 'flex items-start gap-2 chat-bubble';
             messageDiv.innerHTML = `
                 <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
                          alt="Sia" 
                          class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
                          onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
-                <div class="glass rounded-2xl rounded-bl-none p-4 w-full max-w-sm"> <!-- Changed max-w-xs to max-w-sm -->
-                    <div class="flex items-center gap-2 mb-2">
-                        <span class="font-semibold text-blue-800 rainbow-text">Sia</span>
+                <div class="flex flex-col items-start">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-semibold text-blue-800 rainbow-text text-lg">Sia</span>
                         <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
                     </div>
-                    <div class="text-gray-700 leading-relaxed">${isHtml ? message : escapeHtml(message)}</div>
+                    <div class="glass rounded-2xl rounded-tl-none p-4 w-full max-w-sm">
+                        <div class="text-gray-700 leading-relaxed">${isHtml ? message : escapeHtml(message)}</div>
+                    </div>
                 </div>`;
             chatMessages.appendChild(messageDiv);
             scrollToBottom();
+            // No reset here, as this is an AI message, not user activity
         }
         
         function showLoading(type = 'normal') {
@@ -410,14 +443,14 @@
             hideLoading(); 
             const loaderDiv = document.createElement('div');
             loaderDiv.id = loaderId;
-            loaderDiv.className = 'flex items-start gap-2 chat-bubble'; /* Changed gap-3 to gap-2 */
+            loaderDiv.className = 'flex items-start gap-2 chat-bubble';
             if (type === 'tracking') {
                 loaderDiv.innerHTML = `
                     <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
                          alt="Sia" 
                          class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
                          onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
-                    <div class="glass rounded-2xl rounded-bl-none p-4 w-full max-w-sm text-center"> <!-- Changed max-w-xs to max-w-sm -->
+                    <div class="glass rounded-2xl rounded-bl-none p-4 w-full max-w-sm text-center">
                         <div class="truck-loader"><div class="truck"><div class="truck-body"></div><div class="truck-cab"></div><div class="wheel wheel-back"></div><div class="wheel wheel-front"></div></div></div>
                         <p class="text-md font-semibold mt-4 text-blue-800">Tracking your shipment...</p>
                     </div>`;
@@ -427,7 +460,7 @@
                          alt="Sia" 
                          class="hannah-avatar w-12 h-12 rounded-full object-cover flex-shrink-0"
                          onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
-                    <div class="glass rounded-2xl rounded-bl-none p-4 flex items-center gap-2"> <!-- Changed max-w-xs to max-w-sm -->
+                    <div class="glass rounded-2xl rounded-bl-none p-4 flex items-center gap-2">
                         <span class="text-gray-700">Sia is thinking</span>
                         <div class="flex gap-1"><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div><div class="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div></div>
                     </div>`;
@@ -589,6 +622,7 @@
                 voiceInputBtn.querySelector('.material-icons').textContent = 'mic_off';
                 userInput.placeholder = "Listening...";
                 userInput.value = ''; // Clear input field when listening starts
+                // resetInactivityTimer(); // Removed as per user request
             };
 
             recognition.onresult = (event) => {
@@ -630,6 +664,7 @@
             voiceInputBtn.classList.remove('recording');
             voiceInputBtn.querySelector('.material-icons').textContent = 'mic';
             userInput.placeholder = ""; // Reset placeholder
+            // resetInactivityTimer(); // Removed as per user request
         }
 
         // --- Utility Functions ---
@@ -650,6 +685,7 @@
                 e.preventDefault();
                 sendMessage();
             }
+            // resetInactivityTimer(); // Removed as per user request
         });
 
         voiceInputBtn.addEventListener('click', () => {
@@ -658,6 +694,7 @@
             } else {
                 startVoiceInput();
             }
+            // Timer is reset within startVoiceInput and stopVoiceInput
         });
 
         // Initialize app
@@ -668,6 +705,9 @@
             setTimeout(() => {
                 addHannahMessage(`🌟 Thank you for reaching out to KLS Logistics. How can I assist you today?`);
             }, 2000);
+
+            // Start the inactivity timer when the page loads - Removed as per user request
+            // startInactivityTimer();
         });
     </script>
 </body>
