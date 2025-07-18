@@ -628,7 +628,7 @@
             } catch (error) {
                 hideLoading();
                 console.error('AWB Tracking Error:', error);
-                addHannahMessage(`🚫 Sorry, I couldn't fetch the tracking information right now. Please check your connection or try again in a moment.`);
+                addHannahMessage(` Sorry, I couldn't fetch the tracking information right now. Please check your connection or try again in a moment.`);
             }
         }
 
@@ -642,15 +642,16 @@
                 hideLoading();
                 
                 if (data.answer) {
-                    addHannahMessage(`💡 ${data.answer}`);
+                    // Removed the 💡 emoji from here
+                    addHannahMessage(`${data.answer}`);
                 } else {
-                    addHannahMessage(`🤔 I'm not sure how to answer that. I'm best at tracking shipments with an AWB number. Could you please try rephrasing or ask another logistics-related question?`);
+                    addHannahMessage(`I'm not sure how to answer that. I'm best at tracking shipments, with an AWB number. Or I can help with: • Branch Location • Shipping info • Delivery times • Customer support. Could you please try rephrasing or ask another logistics-related question?`);
                 }
                 
             } catch (error) {
                 hideLoading();
                 console.error('FAQ Query Error:', error);
-                addHannahMessage(`🚫 I'm having a little trouble connecting to my knowledge base. Please try asking again in a moment.`);
+                addHannahMessage(` I'm having a little trouble connecting to my knowledge base. Please try asking again in a moment.`);
             }
         }
 
@@ -809,7 +810,7 @@
             userInput.focus();
             
             // Speak the welcome message immediately on load
-            const welcomeMessage = `🌟 Thank you for reaching out to KLS Logistics. How can I assist you today?`;
+            const welcomeMessage = `Thank you for reaching out to KLS Logistics. How can I assist you today?`;
             addHannahMessage(welcomeMessage); // This also calls speakMessage internally
 
             // Start the inactivity timer when the page loads
@@ -822,7 +823,7 @@
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
             }
-            speakMessage("Thanks for choosing KLS Logistics – We’re grateful to serve you at KLS Logistics. We are faster and delivering with care.");
+            speakMessage("Thanks for choosing KLS Logistics – We’re grateful to serve you at KLS Logistics. We are faster, and delivering your packages with care.");
             // Note: SpeechSynthesis might be interrupted if the page closes too quickly.
             // There's no guaranteed way to ensure speech completes on page unload in all browsers.
         });
