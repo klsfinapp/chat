@@ -9,13 +9,21 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            /* Changed background to a dark blue gradient */
-            background: linear-gradient(135deg, #0a1930 0%, #1a2a44 100%);
-            min-height: 100vh;
+        html, body {
+            height: 100%; /* Ensure html and body take full height */
             margin: 0;
             padding: 0;
+            overflow: hidden; /* Prevent body scrollbar, let chat container manage it */
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0a1930 0%, #1a2a44 100%);
+            display: flex; /* Use flexbox for body to center content */
+            align-items: center;
+            justify-content: center;
+            padding: 1rem; /* Add some padding around the container on larger screens */
+            box-sizing: border-box; /* Include padding in element's total width and height */
         }
 
         /* Chat Container */
@@ -23,6 +31,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            /* Removed max-height: 100vh here, let flexbox handle sizing */
         }
 
         /* Animated Sia */
@@ -36,13 +45,13 @@
             50% { transform: scale(1.05); }
         }
 
-        .hannah-avatar { /* Renamed to sia-avatar for consistency, but keeping hannah-avatar for now to avoid breaking existing styles */
+        .hannah-avatar {
             animation: float 3s ease-in-out infinite;
             border: 3px solid #60a5fa;
             box-shadow: 0 0 20px rgba(96, 165, 250, 0.5);
         }
 
-        .hannah-avatar:hover { /* Renamed to sia-avatar for consistency */
+        .hannah-avatar:hover {
             animation: pulse 0.6s ease-in-out;
         }
 
@@ -165,7 +174,7 @@
 
         .timeline-icon {
             position: absolute;
-            left: -1.2rem; /* Adjusted for better alignment */
+            left: -1.2rem;
             top: 0;
             width: 2.4rem;
             height: 2.4rem;
@@ -187,12 +196,11 @@
 
         /* Input styles */
         .chat-input {
-            /* Changed background to a light blue and added shadow */
-            background: rgba(220, 230, 255, 0.9); /* Light blue background */
+            background: rgba(220, 230, 255, 0.9);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(96, 165, 250, 0.3);
             transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Added shadow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
 
         .chat-input:focus {
@@ -214,7 +222,7 @@
 
         /* Voice button specific styles */
         .btn-voice.recording {
-            background: linear-gradient(135deg, #ef4444, #dc2626); /* Red gradient when recording */
+            background: linear-gradient(135deg, #ef4444, #dc2626);
             animation: pulse-red 1s infinite;
         }
 
@@ -239,23 +247,6 @@
             border-radius: 3px;
         }
 
-        /* Mobile optimizations */
-        @media (max-width: 640px) {
-            body {
-                padding: 0;
-            }
-            
-            #chat-container {
-                height: 100vh;
-                border-radius: 0;
-                margin: 0;
-            }
-            
-            .chat-messages {
-                height: calc(100vh - 160px); /* Adjust based on header/footer */
-            }
-        }
-
         /* Custom animations for colorful elements */
         @keyframes rainbow {
             0% { background-position: 0% 50%; }
@@ -270,9 +261,8 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            /* Added text-stroke for white border */
-            -webkit-text-stroke: 1px white; /* White stroke for Webkit browsers */
-            text-stroke: 1px white; /* White stroke for other browsers */
+            -webkit-text-stroke: 1px white;
+            text-stroke: 1px white;
         }
 
         /* Header/Footer animation */
@@ -286,68 +276,107 @@
             background-size: 200% 200%;
             animation: gradient-animation 5s ease infinite;
         }
+
+        /* New style for status badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            line-height: 1;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 640px) {
+            body {
+                padding: 0; /* Remove body padding on small screens */
+            }
+            
+            #chat-container {
+                width: 100%; /* Ensure it takes full width */
+                height: 100%; /* Make the container take full parent height (which is 100% of viewport) */
+                border-radius: 0;
+                margin: 0;
+                max-width: none; /* Remove max-width on mobile to allow full width */
+            }
+            
+            .chat-messages {
+                height: auto; /* Let flex-grow determine height */
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div id="chat-container" class="w-full max-w-md bg-white/90 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
-            <header class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white animated-gradient-bg">
-                <div class="flex items-center gap-3">
-                    <img src="https://wallpapercave.com/uwp/uwp4825588.png" 
-                         alt="KLS Logistics Logo" 
-                         class="w-14 h-14 rounded-full object-cover border-2 border-white/30"
-                         onerror="this.src='https://placehold.co/48x48/1d4ed8/ffffff?text=KLS'">
-                    <div>
-                        <h1 class="text-2xl font-bold text-[#74EAFF]">KLS Logistics</h1>
-                        <p class="text-base rainbow-text">AI Assistant</p>
+    <div id="chat-container" class="w-full max-w-md bg-white/90 rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+        <header class="bg-gradient-to-r from-blue-600 to-purple-600 p-4 text-white animated-gradient-bg">
+            <div class="flex items-center gap-3">
+                <img src="https://wallpapercave.com/uwp/uwp4825588.png" 
+                     alt="KLS Logistics Logo" 
+                     class="w-14 h-14 rounded-full object-cover border-2 border-white/30"
+                     onerror="this.src='https://placehold.co/48x48/1d4ed8/ffffff?text=KLS'">
+
+                <div>
+                    <h1 class="text-2xl font-bold text-[#74EAFF]">KLS Logistics</h1>
+                    <!-- Combined "AI Assistant" and "Online" into a single flex container -->
+                    <div class="flex items-center gap-2">
+                        <p class="text rainbow-text text-sm">AI Assistant</p>
+                        <span class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
+                        <span class="text-sm text-white/90">Online</span>
                     </div>
                 </div>
-            </header>
+            </div>
+        </header>
 
-            <main id="chat-messages" class="chat-messages flex-grow overflow-y-auto p-4 space-y-4 glass">
-                <!-- Initial Welcome Message -->
-                <div class="flex items-start gap-2 chat-bubble">
-                    <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
-                         alt="Sia AI Assistant" 
-                         class="hannah-avatar w-16 h-16 rounded-full object-cover flex-shrink-0"
-                         onerror="this.src='https://placehold.co/64x64/60a5fa/ffffff?text=👩'">
-                    <div class="flex flex-col items-start">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="font-semibold text-blue-800 rainbow-text text-lg">Sia</span>
-                            <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
-                        </div>
-                        <div class="glass rounded-2xl rounded-tl-none p-4 max-w-sm">
-                            <p class="text-gray-700 leading-relaxed">
-                                Hello! I'm Sia, your KLS Logistics AI assistant! 🚚✨
-                            </p>
-                            <p class="text-gray-700 text-sm mt-2">• Enter AWB number for tracking</p>
-                            <p class="text-gray-700 text-sm">• Ask me any logistics questions</p>
-                            <p class="text-gray-700 text-sm">• I'm here to help 24/7!</p>
-                        </div>
+        <main id="chat-messages" class="chat-messages flex-grow overflow-y-auto p-4 space-y-4 glass">
+            <!-- Initial Welcome Message -->
+            <div class="flex items-start gap-2 chat-bubble">
+                <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
+                     alt="Sia AI Assistant" 
+                     class="hannah-avatar w-16 h-16 rounded-full object-cover flex-shrink-0"
+                     onerror="this.src='https://placehold.co/64x64/60a5fa/ffffff?text=👩'">
+                <div class="flex flex-col items-start">
+                    <div class="flex items-center gap-2 mb-1">
+                        <!-- "Sia" with bold font and rainbow text -->
+                        <span class="font-bold text-lg rainbow-text">Sia</span>
+                        <!-- "AI Assistant" as a status badge with gradient -->
+                        <span class="status-badge bg-gradient-to-r from-blue-500 to-purple-500 text-white">AI Assistant</span>
+                    </div>
+                    <div class="glass rounded-2xl rounded-tl-none p-4 max-w-sm">
+                        <p class="text-gray-700 leading-relaxed">
+                            Hello! I'm Sia, your KLS Logistics AI assistant! 🚚✨
+                        </p>
+                        <p class="text-gray-700 text-sm mt-2">• Enter AWB number for tracking</p>
+                        <p class="text-gray-700 text-sm">• Ask me any logistics questions</p>
+                        <p class="text-gray-700 text-sm">• I'm here to help 24/7!</p>
                     </div>
                 </div>
-                 <!-- Loading indicators will be injected here by JS -->
-            </main>
+            </div>
+             <!-- Loading indicators will be injected here by JS -->
+        </main>
 
-            <footer class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 border-t border-gray-200/50 animated-gradient-bg">
-                <div class="flex items-center gap-3 w-full"> <!-- Added w-full here to ensure the flex container takes full width -->
-                    <input type="text" 
-                           id="user-input" 
-                           class="chat-input flex-grow p-3 rounded-xl focus:outline-none focus:ring-0 placeholder-gray-500 min-w-0">
-                    <button id="voice-input-btn"
-                            class="btn-voice p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
-                        <span class="material-icons">mic</span>
-                    </button>
-                    <button onclick="sendMessage()" 
-                            class="btn-send p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
-                        <span class="material-icons">send</span>
-                    </button>
-                </div>
-                <p class="text-xs text-gray-900 mt-2 text-center rainbow-text">
-                    Powered by KLS Logistics AI • Available 24/7
-                </p>
-            </footer>
-        </div>
+        <footer class="p-4 bg-gradient-to-r from-blue-600 to-purple-600 border-t border-gray-200/50 animated-gradient-bg">
+            <div class="flex items-center gap-3 w-full">
+                <input type="text" 
+                       id="user-input" 
+                       class="chat-input flex-grow p-3 rounded-xl focus:outline-none focus:ring-0 placeholder-gray-500 min-w-0">
+                <button id="voice-input-btn"
+                        class="btn-voice p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span class="material-icons">mic</span>
+                </button>
+                <button onclick="sendMessage()" 
+                        class="btn-send p-3 rounded-xl text-white flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span class="material-icons">send</span>
+                </button>
+            </div>
+            <p class="text-xs text-gray-900 mt-2 text-center rainbow-text">
+                Powered by KLS Logistics AI • Available 24/7
+            </p>
+        </footer>
     </div>
 
     <script>
@@ -356,7 +385,7 @@
             AWB_SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw2P8s2pXbRgxtpbLAEFr3JwNBAqJvXvSZdXfDJQ_xC_ptaQx6OuVkQtI1_jsmEvT06Mg/exec",
             FAQ_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby2sD6dNXBNHV-q8PyahjS7bMzVdDjskEpDWQr1ncG1cQlM5nUi9fIfxc7BIES0eag/exec",
             TYPING_DELAY: 1000,
-            // INACTIVITY_TIMEOUT: 30000 // 30 seconds - Removed as per user request
+            INACTIVITY_TIMEOUT: 60000 // 1 minute in milliseconds
         };
 
         // --- DOM Elements ---
@@ -391,19 +420,19 @@
             'Status'
         ];
 
-        // --- Inactivity Timer - Removed as per user request ---
-        // let inactivityTimer;
+        // --- Inactivity Timer ---
+        let inactivityTimer;
 
-        // function startInactivityTimer() {
-        //     inactivityTimer = setTimeout(() => {
-        //         addHannahMessage("Do you want any further Assistance?");
-        //     }, CONFIG.INACTIVITY_TIMEOUT);
-        // }
+        function startInactivityTimer() {
+            clearTimeout(inactivityTimer); // Clear any existing timer
+            inactivityTimer = setTimeout(() => {
+                speakMessage("Thanks for choosing KLS Logistics – We’re grateful to serve you at KLS Logistics. We are faster, and we are delivering your packages with care.");
+            }, CONFIG.INACTIVITY_TIMEOUT);
+        }
 
-        // function resetInactivityTimer() {
-        //     clearTimeout(inactivityTimer);
-        //     startInactivityTimer();
-        // }
+        function resetInactivityTimer() {
+            startInactivityTimer(); // Simply restart the timer
+        }
 
         // --- Chat Functions ---
 
@@ -413,12 +442,68 @@
             messageDiv.innerHTML = `<div class="bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-2xl rounded-br-none p-4 max-w-xs"><p class="leading-relaxed">${escapeHtml(message)}</p></div>`;
             chatMessages.appendChild(messageDiv);
             scrollToBottom();
-            // resetInactivityTimer(); // Removed as per user request
+            resetInactivityTimer(); // Reset timer on user activity
+        }
+
+        // --- Text-to-Speech Variables ---
+        let indianFemaleVoice = null;
+        let genericFemaleVoice = null;
+
+        // Function to set up the voice for text-to-speech
+        function setSpeechVoice() {
+            const voices = window.speechSynthesis.getVoices();
+            // Prioritize finding an Indian female voice (en-IN)
+            indianFemaleVoice = voices.find(voice => 
+                voice.lang.startsWith('en-IN') && (voice.name.includes('Female') || voice.name.includes('Feminine'))
+            );
+            
+            // Fallback to a generic English female voice if an Indian one isn't found
+            if (!indianFemaleVoice) {
+                genericFemaleVoice = voices.find(voice => 
+                    (voice.lang.startsWith('en') || voice.lang.startsWith('en-US')) && (voice.name.includes('Female') || voice.name.includes('Feminine'))
+                );
+            }
+            
+            // If still no specific female voice, try any English female voice or default English voice
+            if (!indianFemaleVoice && !genericFemaleVoice) {
+                genericFemaleVoice = voices.find(voice => 
+                    (voice.lang.startsWith('en') || voice.lang.startsWith('en-US')) && voice.gender === 'female'
+                ) || voices.find(voice => voice.lang.startsWith('en')); // Fallback to any English voice
+            }
+        }
+
+        // Populate voices when they are loaded (asynchronously)
+        if (window.speechSynthesis) {
+            window.speechSynthesis.onvoiceschanged = setSpeechVoice;
+            // Call immediately in case voices are already loaded
+            setSpeechVoice(); 
+        }
+
+        function speakMessage(text) {
+            if ('speechSynthesis' in window) {
+                // Stop any ongoing speech to prevent overlap
+                window.speechSynthesis.cancel(); 
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = indianFemaleVoice || genericFemaleVoice;
+                utterance.pitch = 1; // Default pitch
+                utterance.rate = 0.8;  // Adjusted rate for slower speaking
+                
+                // If a specific voice is not found (e.g., selectedVoice is null), try setting a generic English language
+                if (!utterance.voice) {
+                    utterance.lang = 'en-US'; // Fallback language
+                }
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn("Speech Synthesis API not supported in this browser.");
+            }
         }
 
         function addHannahMessage(message, isHtml = false) {
             const messageDiv = document.createElement('div');
             messageDiv.className = 'flex items-start gap-2 chat-bubble';
+            const displayMessage = isHtml ? message : escapeHtml(message);
             messageDiv.innerHTML = `
                 <img src="https://wallpapercave.com/uwp/uwp4825585.gif" 
                          alt="Sia" 
@@ -426,19 +511,44 @@
                          onerror="this.src='https://placehold.co/48x48/60a5fa/ffffff?text=👩'">
                 <div class="flex flex-col items-start">
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-blue-800 rainbow-text text-lg">Sia</span>
-                        <span class="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded-full">AI</span>
+                        <span class="font-bold text-lg rainbow-text">Sia</span>
+                        <span class="status-badge bg-gradient-to-r from-blue-500 to-purple-500 text-white">AI Assistant</span>
                     </div>
                     <div class="glass rounded-2xl rounded-tl-none p-4 w-full max-w-sm">
-                        <div class="text-gray-700 leading-relaxed">${isHtml ? message : escapeHtml(message)}</div>
+                        <div class="text-gray-700 leading-relaxed">${displayMessage}</div>
                     </div>
                 </div>`;
             chatMessages.appendChild(messageDiv);
             scrollToBottom();
+            
+            // Extract plain text for speech synthesis
+            let plainTextForSpeech;
+            if (isHtml) {
+                // Create a temporary div to parse the HTML string
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = message;
+                const headingElement = tempDiv.querySelector('h3.font-bold.text-lg.text-blue-800');
+                if (headingElement && headingElement.textContent.startsWith('📦 Tracking:')) {
+                    plainTextForSpeech = headingElement.textContent;
+                } else {
+                    // Fallback for other HTML messages if any, or just get all text
+                    plainTextForSpeech = tempDiv.textContent;
+                }
+            } else {
+                // For non-HTML messages, use the text content directly
+                plainTextForSpeech = messageDiv.querySelector('.text-gray-700.leading-relaxed').textContent;
+            }
+            
+            speakMessage(plainTextForSpeech); // Speak the message
             // No reset here, as this is an AI message, not user activity
         }
         
         function showLoading(type = 'normal') {
+            // Stop speech when loading indicator appears
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+
             const loaderId = `${type}-loader`;
             hideLoading(); 
             const loaderDiv = document.createElement('div');
@@ -485,6 +595,8 @@
 
         async function handleAWBTracking(awbNumber) {
             showLoading('tracking');
+            // Speak "Please Wait ! Tracking your shipment."
+            speakMessage("Please Wait ! Tracking your shipment.");
             try {
                 const response = await fetch(`${CONFIG.AWB_SCRIPT_URL}?awb=${awbNumber}`);
                 if (!response.ok) throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -528,11 +640,6 @@
                 
                 const data = await response.json();
                 hideLoading();
-                
-                if (data.error) {
-                    addHannahMessage(`❌ ${data.error}`);
-                    return;
-                }
                 
                 if (data.answer) {
                     addHannahMessage(`💡 ${data.answer}`);
@@ -622,7 +729,7 @@
                 voiceInputBtn.querySelector('.material-icons').textContent = 'mic_off';
                 userInput.placeholder = "Listening...";
                 userInput.value = ''; // Clear input field when listening starts
-                // resetInactivityTimer(); // Removed as per user request
+                resetInactivityTimer(); // Reset timer on user activity
             };
 
             recognition.onresult = (event) => {
@@ -664,7 +771,7 @@
             voiceInputBtn.classList.remove('recording');
             voiceInputBtn.querySelector('.material-icons').textContent = 'mic';
             userInput.placeholder = ""; // Reset placeholder
-            // resetInactivityTimer(); // Removed as per user request
+            resetInactivityTimer(); // Reset timer on user activity
         }
 
         // --- Utility Functions ---
@@ -685,7 +792,7 @@
                 e.preventDefault();
                 sendMessage();
             }
-            // resetInactivityTimer(); // Removed as per user request
+            resetInactivityTimer(); // Reset timer on user activity
         });
 
         voiceInputBtn.addEventListener('click', () => {
@@ -694,20 +801,30 @@
             } else {
                 startVoiceInput();
             }
-            // Timer is reset within startVoiceInput and stopVoiceInput
+            resetInactivityTimer(); // Reset timer on user activity
         });
 
         // Initialize app
         document.addEventListener('DOMContentLoaded', () => {
             userInput.focus();
             
-            // Add some sample suggestions after initial load
-            setTimeout(() => {
-                addHannahMessage(`🌟 Thank you for reaching out to KLS Logistics. How can I assist you today?`);
-            }, 2000);
+            // Speak the welcome message immediately on load
+            const welcomeMessage = `🌟 Thank you for reaching out to KLS Logistics. How can I assist you today?`;
+            addHannahMessage(welcomeMessage); // This also calls speakMessage internally
 
-            // Start the inactivity timer when the page loads - Removed as per user request
-            // startInactivityTimer();
+            // Start the inactivity timer when the page loads
+            startInactivityTimer();
+        });
+
+        // Event listener for page closure/hide
+        window.addEventListener('pagehide', () => {
+            // Stop any ongoing speech and then speak the closing message
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            speakMessage("Thanks for choosing KLS Logistics – We’re grateful to serve you at KLS Logistics. We are faster and delivering with care.");
+            // Note: SpeechSynthesis might be interrupted if the page closes too quickly.
+            // There's no guaranteed way to ensure speech completes on page unload in all browsers.
         });
     </script>
 </body>
